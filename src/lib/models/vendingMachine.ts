@@ -1,4 +1,4 @@
-export type VendingMachineSlot = {
+export type VendingMachineSelection = {
     sku: string;
     label: string;
     description?: string;
@@ -11,5 +11,5 @@ export type VendingMachine = {
     id: string;
     name: string;
     bankTotal: number;
-    slots: VendingMachineSlot[];
+    selections: VendingMachineSelection[];
 }
