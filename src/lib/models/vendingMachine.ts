@@ -1,4 +1,4 @@
-export type VendingMachineSelection = {
+export type VendingMachineSelectionType = {
     sku: string;
     label: string;
     description?: string;
@@ -7,9 +7,10 @@ export type VendingMachineSelection = {
     maxCount: number;
 }
 
-export type VendingMachine = {
+export type VendingMachineType = {
     id: string;
     name: string;
-    bankTotal: number;
-    selections: VendingMachineSelection[];
+    salesTotal: number;
+    selections: VendingMachineSelectionType[];
+    depositAmounts?: number[]
 }
