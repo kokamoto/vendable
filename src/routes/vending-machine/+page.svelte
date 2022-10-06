@@ -1,6 +1,6 @@
 <script lang="ts">
 	import VendingMachine from "$lib/components/VendingMachine.svelte";
-import type { VendingMachineType, VendingMachineSelectionType } from "$lib/models/vendingMachine";
+    import type { VendingMachineType } from "$lib/models/vendingMachine";
 	import { onMount } from "svelte";
 
     let id: string;
@@ -13,21 +13,8 @@ import type { VendingMachineType, VendingMachineSelectionType } from "$lib/model
         depositAmounts: []
     };
 
-    function getSelection(sku: string): VendingMachineSelectionType | undefined {
-        return machine.selections.find(selection => selection.sku === sku);
-    }
-
-    function purchase(event: Event) {
-        const target: Element = event.target as Element;
-        const sku = target.attributes.getNamedItem("data-sku")?.value;
-        if (sku) {
-            const selection: VendingMachineSelectionType | undefined = getSelection(sku);
-            if (selection) {
-                machine.salesTotal += selection.price;
-                selection.count -= 1;
-            }
-        }
-
+    function purchase(event: any) {
+        alert("PURCHASED: " + event.detail.selection.label)
     }
 
     onMount(async () => {
@@ -62,4 +49,4 @@ import type { VendingMachineType, VendingMachineSelectionType } from "$lib/model
     {/each}
 </div> -->
 
-<VendingMachine machine={machine}></VendingMachine>
+<VendingMachine machine={machine} on:purchase={purchase}></VendingMachine>
