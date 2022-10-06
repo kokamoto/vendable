@@ -1,11 +1,22 @@
 <script lang="ts">
-	import type { VendingMachineType } from "$lib/models/vendingMachine";
+	import type { VendingMachineSelectionType, VendingMachineType } from "$lib/models/vendingMachine";
+	import { createEventDispatcher } from "svelte";
 
     export let machine: VendingMachineType;
     let depositAmounts: number[];
     let transactionAmount: number = 0;
 
+    const dispatch = createEventDispatcher();
+
     $: depositAmounts = machine.depositAmounts || [5, 10, 20, 50];
+
+    function purchase(selection: VendingMachineSelectionType) {
+        // calculate remainder
+        const changeBack = transactionAmount - selection.price;
+        // zero transaction
+        transactionAmount = 0;
+        dispatch('purchase', { selection, changeBack });
+    }
 
 </script>
 
@@ -21,7 +32,8 @@
 </div>
 <div role="list" data-testid="selection-list">
     {#each machine?.selections as selection }
-        <div class="selection" data-sku="{selection.sku}" aria-labelledby="{selection.sku}" role="listitem">
+        <div class="selection" data-sku="{selection.sku}" aria-labelledby="{selection.sku}" role="listitem"
+            on:click={() => purchase(selection)}>
             <span class="selection-label" id="{selection.sku}">{selection.label}</span>
             <span class="selection-price">{selection.price} credits</span>
         </div>

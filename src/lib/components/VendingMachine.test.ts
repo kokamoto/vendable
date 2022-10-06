@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/svelte';
 import '@testing-library/jest-dom';
 import VendingMachine from './VendingMachine.svelte';
-import type { VendingMachineType } from '$lib/models/vendingMachine';
+import type { PurchaseEventDetailType, VendingMachineType } from '$lib/models/vendingMachine';
 
 describe("VendingMachine component", () => {
     let machine: VendingMachineType;
@@ -102,18 +102,96 @@ describe("VendingMachine component", () => {
 
     it("should increase the transaction amount by the amount deposited", async () => {
         render(VendingMachine, {machine});
-        const deposit5 = screen.getByText('5 credits');
-        const deposit10 = screen.getByText('10 credits');
-        let transaction = screen.getByLabelText("Amount Deposited:");
+        const depositList = screen.getByTestId("deposit-list")
+        const deposit5 = within(depositList).getByText('5 credits');
+        const deposit10 = within(depositList).getByText('10 credits');
 
         await fireEvent.click(deposit10);
+        let transaction = screen.getByLabelText("Amount Deposited:");
         expect(transaction).toHaveTextContent("10 credits");
 
         await fireEvent.click(deposit5);
+        transaction = screen.getByLabelText("Amount Deposited:");
         expect(transaction).toHaveTextContent("15 credits");
 
         await fireEvent.click(deposit10);
+        transaction = screen.getByLabelText("Amount Deposited:");
         expect(transaction).toHaveTextContent("25 credits");
+    });
+
+    it("should emit a purchase event when an item is purchased", async () => {
+        const { component} = render(VendingMachine, {machine});
+        const selectionList = screen.getByTestId("selection-list");
+        const lime = within(selectionList).getByText("Citrus Cola: Lime");
+        const depositList = screen.getByTestId("deposit-list")
+        const deposit = within(depositList).getByText('50 credits');
+        const transaction = screen.getByLabelText("Amount Deposited:");
+
+        let mockFn = vi.fn();
+        let item: PurchaseEventDetailType = {
+            selection: {
+                sku: '',
+                label: '',
+                price: 0,
+                count: 0,
+                maxCount: 0
+            },
+            changeBack: 0
+        };
+
+        component.$on('purchase', function (event) {
+            item = event.detail as PurchaseEventDetailType;
+            mockFn(event.detail);
+        });
+
+        await fireEvent.click(deposit);
+        expect(transaction).toHaveTextContent("50 credits");
+
+        await fireEvent.click(lime);
+
+        expect(mockFn).toHaveBeenCalled();
+        expect(item.selection.label).toBe("Citrus Cola: Lime");
+        expect(item.changeBack).toBe(0);
+        expect(transaction).toHaveTextContent(/^0 credits/);
+    });
+
+    it("should give correct change amount back after purchase", async () => {
+        const { component} = render(VendingMachine, {machine});
+        const selectionList = screen.getByTestId("selection-list");
+        const yuzu = within(selectionList).getByText("Citrus Cola: Yuzu");
+        const depositList = screen.getByTestId("deposit-list")
+        const deposit = within(depositList).getByText('50 credits');
+        const transaction = screen.getByLabelText("Amount Deposited:");
+
+        let mockFn = vi.fn();
+        let item: PurchaseEventDetailType = {
+            selection: {
+                sku: '',
+                label: '',
+                price: 0,
+                count: 0,
+                maxCount: 0
+            },
+            changeBack: 0
+        };
+
+        component.$on('purchase', function (event) {
+            item = event.detail as PurchaseEventDetailType;
+            mockFn(event.detail);
+        });
+
+        await fireEvent.click(deposit);
+        expect(transaction).toHaveTextContent("50 credits");
+        await fireEvent.click(deposit);
+        expect(transaction).toHaveTextContent("100 credits");
+
+        await fireEvent.click(yuzu);
+
+        expect(mockFn).toHaveBeenCalled();
+        expect(item.selection.label).toBe("Citrus Cola: Yuzu");
+        expect(item.changeBack).toBe(40);
+        expect(transaction).toHaveTextContent(/^0 credits/);
+
     });
 
 });

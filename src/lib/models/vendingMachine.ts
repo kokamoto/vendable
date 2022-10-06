@@ -14,3 +14,8 @@ export type VendingMachineType = {
     selections: VendingMachineSelectionType[];
     depositAmounts?: number[]
 }
+
+export type PurchaseEventDetailType = {
+    selection: VendingMachineSelectionType;
+    changeBack: number;
+}
