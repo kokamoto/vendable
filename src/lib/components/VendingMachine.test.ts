@@ -191,7 +191,48 @@ describe("VendingMachine component", () => {
         expect(item.selection.label).toBe("Citrus Cola: Yuzu");
         expect(item.changeBack).toBe(40);
         expect(transaction).toHaveTextContent(/^0 credits/);
+    });
 
+    it("should not allow a purchase if the transaction amount is less than the price", async () => {
+        const { component} = render(VendingMachine, {machine});
+        const selectionList = screen.getByTestId("selection-list");
+        const lime = within(selectionList).getByText("Citrus Cola: Lime");
+        const depositList = screen.getByTestId("deposit-list")
+        const deposit = within(depositList).getByText('20 credits');
+        const transaction = screen.getByLabelText("Amount Deposited:");
+
+        let mockFn = vi.fn();
+        let item: PurchaseEventDetailType = {
+            selection: {
+                sku: '',
+                label: '',
+                price: 0,
+                count: 0,
+                maxCount: 0
+            },
+            changeBack: 0
+        };
+
+        component.$on('purchase', function (event) {
+            item = event.detail as PurchaseEventDetailType;
+            mockFn(event.detail);
+        });
+
+        await fireEvent.click(deposit);
+        expect(transaction).toHaveTextContent("20 credits");
+        await fireEvent.click(deposit);
+        expect(transaction).toHaveTextContent("40 credits");
+
+        await fireEvent.click(lime);
+        expect(mockFn).not.toHaveBeenCalled();
+        expect(transaction).toHaveTextContent("40 credits");
+
+        await fireEvent.click(deposit);
+        expect(transaction).toHaveTextContent("60 credits");
+
+        await fireEvent.click(lime);
+        expect(mockFn).toHaveBeenCalled();
+        expect(transaction).toHaveTextContent(/^0 credits/);
     });
 
 });

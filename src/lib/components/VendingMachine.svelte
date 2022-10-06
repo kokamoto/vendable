@@ -11,6 +11,10 @@
     $: depositAmounts = machine.depositAmounts || [5, 10, 20, 50];
 
     function purchase(selection: VendingMachineSelectionType) {
+        // check to see if there is enough credits
+        if (selection.price > transactionAmount) {
+            return;
+        }
         // calculate remainder
         const changeBack = transactionAmount - selection.price;
         // zero transaction
@@ -33,6 +37,7 @@
 <div role="list" data-testid="selection-list">
     {#each machine?.selections as selection }
         <div class="selection" data-sku="{selection.sku}" aria-labelledby="{selection.sku}" role="listitem"
+            disabled={selection.price > transactionAmount}
             on:click={() => purchase(selection)}>
             <span class="selection-label" id="{selection.sku}">{selection.label}</span>
             <span class="selection-price">{selection.price} credits</span>
