@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { VendingMachineSelectionType, VendingMachineType } from "$lib/models/vendingMachine";
 	import { createEventDispatcher } from "svelte";
+	import VendingMachineSelection from "./VendingMachineSelection.svelte";
 
     export let machine: VendingMachineType;
     let depositAmounts: number[];
@@ -36,12 +37,8 @@
 </div>
 <div class="selection-list" role="list" data-testid="selection-list">
     {#each machine?.selections as selection }
-        <div class="selection" data-sku="{selection.sku}" aria-labelledby="{selection.sku}" role="listitem"
-            disabled={selection.price > transactionAmount}
-            on:click={() => purchase(selection)}>
-            <div class="selection-label" id="{selection.sku}">{selection.label}</div>
-            <div class="selection-price">{selection.price} credits</div>
-        </div>
+        <VendingMachineSelection selection={selection} threshold={transactionAmount}
+            on:click={() => purchase(selection)}></VendingMachineSelection>
     {/each}
 </div>
 
@@ -50,20 +47,4 @@
         display: flex;
         flex-wrap: wrap;
     }
-    .selection {
-        height: 10rem;
-        width: 15rem;
-        border: 1px solid #333;
-        border-radius: 5px;
-        text-align: center;
-        margin: 1rem;
-        cursor: pointer;
-    }
-    .selection:active {
-        background-color: #eee;
-    }
-    .selection:hover {
-        border-color: #090;
-    }
-
 </style>
