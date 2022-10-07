@@ -31,9 +31,21 @@
                 count: 10,
                 maxCount: 10
             }, {
+                sku: 'CIT-COLA-LEMON-001',
+                label: 'Citrus Cola: Lemon',
+                price: 50,
+                count: 10,
+                maxCount: 10
+            }, {
                 sku: 'CIT-COLA-YUZU-001',
                 label: 'Citrus Cola: Yuzu',
                 price: 50,
+                count: 10,
+                maxCount: 10
+            }, {
+                sku: 'CIT-COLA-BLOOD-001',
+                label: 'Citrus Cola: Blood Orange',
+                price: 60,
                 count: 10,
                 maxCount: 10
             }]

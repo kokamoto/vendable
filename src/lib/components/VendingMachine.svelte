@@ -34,13 +34,36 @@
         <button on:click={() => transactionAmount += depositAmount}>{depositAmount} credits</button>
     {/each}
 </div>
-<div role="list" data-testid="selection-list">
+<div class="selection-list" role="list" data-testid="selection-list">
     {#each machine?.selections as selection }
         <div class="selection" data-sku="{selection.sku}" aria-labelledby="{selection.sku}" role="listitem"
             disabled={selection.price > transactionAmount}
             on:click={() => purchase(selection)}>
-            <span class="selection-label" id="{selection.sku}">{selection.label}</span>
-            <span class="selection-price">{selection.price} credits</span>
+            <div class="selection-label" id="{selection.sku}">{selection.label}</div>
+            <div class="selection-price">{selection.price} credits</div>
         </div>
     {/each}
 </div>
+
+<style>
+    .selection-list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .selection {
+        height: 10rem;
+        width: 15rem;
+        border: 1px solid #333;
+        border-radius: 5px;
+        text-align: center;
+        margin: 1rem;
+        cursor: pointer;
+    }
+    .selection:active {
+        background-color: #eee;
+    }
+    .selection:hover {
+        border-color: #090;
+    }
+
+</style>
